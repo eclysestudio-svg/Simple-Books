@@ -1,0 +1,16 @@
+{
+  "name": "simple-books",
+  "version": "1.0.0",
+  "description": "Simple Books Landing Page",
+  "main": "index.html",
+  "scripts": {
+    "start": "live-server",
+    "build": "echo \"Build step complete\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  }
+}

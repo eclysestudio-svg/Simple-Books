@@ -1,0 +1,1554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Books | Smart Financial Management</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lenis Smooth Scroll -->
+    <script src="https://unpkg.com/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+    <!-- GSAP for Animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <!-- SplitType for Text Animation -->
+    <script src="https://unpkg.com/split-type"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f2fbf5',
+                            100: '#e1f7e8',
+                            200: '#c4ecd2',
+                            300: '#96dbb0',
+                            400: '#5fc286',
+                            500: '#39a667',
+                            600: '#288550',
+                            700: '#236a42',
+                            800: '#1f5537',
+                            900: '#1b462f',
+                        },
+                        stone: {
+                            50: '#fafaf9',
+                            100: '#f5f5f4',
+                            200: '#e7e5e4',
+                            300: '#d6d3d1',
+                            400: '#a8a29e',
+                            500: '#78716c',
+                            600: '#57534e',
+                            700: '#44403c',
+                            800: '#292524',
+                            900: '#1c1917',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { 
+            background-color: #fafaf9; 
+            color: #1c1917; 
+            overflow-x: hidden;
+            cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' stroke='%23fff' stroke-width='1.5' stroke-linejoin='round' d='M5 3l0 16 4.3-4.5 3.3 7.3 2.5-1.1-3.3-7.2 5.5 0z'/%3E%3C/svg%3E") 5 3, auto;
+        }
+
+        a, button, .cursor-pointer, [data-cursor-hover] { 
+            cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' stroke='%23fff' stroke-width='1.5' stroke-linejoin='round' d='M10 11V4c0-1.1.9-2 2-2s2 .9 2 2v7M14 11V7c0-1.1.9-2 2-2s2 .9 2 2v4M18 11V9c0-1.1.9-2 2-2s2 .9 2 2v5c0 3.3-2.7 6-6 6H9c-3.3 0-5.5-2.2-6-5v-3c0-1.1.9-2 2-2s2 .9 2 2v2'/%3E%3C/svg%3E") 9 2, pointer !important;
+        }
+
+        /* --- Preloader --- */
+        #preloader {
+            position: fixed;
+            inset: 0;
+            z-index: 99999;
+            background: #fafaf9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+        }
+        #preloader-bar-track {
+            width: 200px;
+            height: 1px;
+            background: #e7e5e4;
+            border-radius: 99px;
+            overflow: hidden;
+        }
+        #preloader-bar {
+            height: 100%;
+            width: 0%;
+            background: #288550;
+            border-radius: 99px;
+        }
+
+        /* --- Custom Cursor --- */
+        #cursor-dot, #cursor-ring { display: none; }
+
+        /* --- Mobile Menu --- */
+        #mobile-menu {
+            position: fixed;
+            inset: 0;
+            z-index: 60;
+            background: #fafaf9;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 0;
+            visibility: hidden;
+            opacity: 0;
+        }
+        .mobile-menu-link {
+            font-size: clamp(2.5rem, 8vw, 4rem);
+            font-weight: 800;
+            color: #1c1917;
+            text-decoration: none;
+            letter-spacing: -0.03em;
+            line-height: 1.15;
+            transition: color 0.2s;
+            overflow: hidden;
+            display: block;
+        }
+        .mobile-menu-link:hover { color: #288550; }
+        .mobile-menu-link-inner { display: block; }
+
+        /* Hamburger */
+        #hamburger { display: flex; flex-direction: column; gap: 5px; cursor: none; background: none; border: none; padding: 4px; }
+        #hamburger span { display: block; width: 24px; height: 1.5px; background: #1c1917; border-radius: 2px; transition: all 0.35s cubic-bezier(0.16,1,0.3,1); transform-origin: center; }
+        #hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+        #hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+        #hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+        /* Lenis */
+        html.lenis { height: auto; }
+        .lenis.lenis-smooth { scroll-behavior: auto !important; }
+        .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+        .lenis.lenis-stopped { overflow: hidden; }
+        .lenis.lenis-scrolling iframe { pointer-events: none; }
+        
+        .nav-glass {
+            background: rgba(250, 250, 249, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .hero-gradient {
+            background: radial-gradient(circle at 50% 0%, #e1f7e8 0%, rgba(250, 250, 249, 0) 60%);
+        }
+
+        /* Hover Reveal Styles */
+        .hover-card {
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .hover-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.1);
+            border-color: #96dbb0;
+        }
+        
+        .hover-reveal {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .hover-card:hover .hover-reveal {
+            max-height: 150px;
+            opacity: 1;
+            margin-top: 1rem;
+        }
+
+        /* Dashboard Mockup Grid */
+        .dash-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            height: 100%;
+        }
+        @media (min-width: 768px) {
+            .dash-grid {
+                grid-template-columns: 240px 1fr;
+            }
+        }
+
+        .line {
+            overflow: hidden;
+        }
+
+        .flowing-line {
+            position: absolute;
+            top: 20%;
+            left: -10%;
+            width: 120%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.5;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #fafaf9; }
+        ::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #a8a29e; }
+
+        /* Prevent FOUC for animated elements */
+        .dash-wrapper, .dash-menu-item, .dash-header, .dash-card, .dash-list-item, .gs-reveal {
+            visibility: hidden;
+        }
+
+        /* FAQ Accordion */
+        .faq-answer {
+            overflow: hidden;
+            height: 0;
+        }
+        .faq-item {
+            border-bottom: 1px solid #e7e5e4;
+        }
+        .faq-item:last-child { border-bottom: none; }
+        .faq-icon {
+            transition: transform 0.4s cubic-bezier(0.16,1,0.3,1);
+            flex-shrink: 0;
+        }
+        .faq-item.open .faq-icon { transform: rotate(45deg); }
+    </style>
+</head>
+<body class="antialiased selection:bg-brand-200 selection:text-brand-900">
+
+    <!-- Preloader -->
+    <div id="preloader">
+        <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:32px;height:32px;background:#288550;border-radius:10px;display:flex;align-items:center;justify-content:center;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+            </div>
+            <span style="font-family:Inter,sans-serif;font-weight:700;font-size:1.1rem;color:#1c1917;letter-spacing:-0.03em;">Simple Books</span>
+        </div>
+        <div id="preloader-bar-track">
+            <div id="preloader-bar"></div>
+        </div>
+        <p style="font-family:Inter,sans-serif;font-size:0.75rem;color:#a8a29e;letter-spacing:0.1em;text-transform:uppercase;" id="preloader-text">Loading</p>
+    </div>
+
+    <!-- Custom Cursor -->
+    <div id="cursor-dot"></div>
+    <div id="cursor-ring"></div>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobile-menu">
+        <div style="position:absolute;top:1.5rem;right:1.5rem;">
+            <button id="mobile-menu-close" style="width:44px;height:44px;border-radius:50%;border:1px solid #e7e5e4;background:white;display:flex;align-items:center;justify-content:center;cursor:none;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1c1917" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
+        <nav style="text-align:center;display:flex;flex-direction:column;gap:0.25rem;">
+            <a href="#features" class="mobile-menu-link"><span class="mobile-menu-link-inner">Features</span></a>
+            <a href="#collaboration" class="mobile-menu-link"><span class="mobile-menu-link-inner">Collaboration</span></a>
+            <a href="#automation" class="mobile-menu-link"><span class="mobile-menu-link-inner">Automation</span></a>
+            <a href="#reviews" class="mobile-menu-link"><span class="mobile-menu-link-inner">Reviews</span></a>
+        </nav>
+        <div style="margin-top:3rem;display:flex;flex-direction:column;gap:1rem;align-items:center;">
+            <button class="open-pricing-modal" style="padding:1rem 2.5rem;background:#288550;color:white;border-radius:999px;font-weight:700;font-size:1rem;border:none;cursor:none;">Start Free Trial</button>
+        </div>
+    </div>
+
+    <!-- Noise/Grain Overlay -->
+    <div class="fixed inset-0 z-[9999] pointer-events-none opacity-[0.03] mix-blend-multiply" style="background-image: url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E');"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full top-0 z-50 nav-glass transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-3 cursor-pointer group">
+                <div class="w-10 h-10 bg-brand-600 rounded-xl flex items-center justify-center text-white font-bold transition-transform group-hover:rotate-12 shadow-sm">
+                    <i data-lucide="calculator" class="w-5 h-5"></i>
+                </div>
+                <span class="text-xl font-bold tracking-tight text-stone-900">Simple Books</span>
+            </div>
+            
+            <div class="hidden md:flex items-center gap-8 text-sm font-medium text-stone-600">
+                <a href="#features" class="hover:text-brand-600 transition-colors">Features</a>
+                <a href="#collaboration" class="hover:text-brand-600 transition-colors">Collaboration</a>
+                <a href="#automation" class="hover:text-brand-600 transition-colors">Automation</a>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <button class="text-sm font-medium text-stone-700 hover:text-stone-900 transition-colors hidden sm:block">Sign In</button>
+                <button class="magnetic-btn open-pricing-modal bg-brand-600 hover:bg-brand-700 text-white px-6 py-2.5 rounded-full text-sm font-medium transition-all shadow-lg shadow-brand-600/20 hover:shadow-brand-600/40 hover:-translate-y-0.5 hidden md:inline-flex">
+                    Start Free
+                </button>
+                <!-- Hamburger - Mobile only -->
+                <button id="hamburger" class="md:hidden" aria-label="Open menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative pt-32 md:pt-48 pb-20 px-6 hero-gradient overflow-hidden">
+        <!-- Flowing Line SVG -->
+        <svg class="flowing-line" viewBox="0 0 1000 300" preserveAspectRatio="none">
+            <path id="hero-flow-path" d="M0,150 C200,300 400,0 600,150 C800,300 1000,0 1200,150" fill="none" stroke="#10b981" stroke-width="1.5" stroke-linecap="round" class="opacity-20" />
+            <path id="hero-flow-path-2" d="M0,180 C250,30 450,280 650,180 C850,80 1050,300 1200,180" fill="none" stroke="#059669" stroke-width="1" stroke-linecap="round" class="opacity-10" />
+        </svg>
+
+        <div class="max-w-7xl mx-auto flex flex-col items-center text-center relative z-10">
+            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-50 border border-brand-200 text-brand-700 text-sm font-medium mb-8 gs-reveal">
+                <span class="relative flex h-2 w-2">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-500"></span>
+                </span>
+                Introducing Multi-User Access
+            </div>
+            
+            <h1 class="text-6xl md:text-8xl font-black text-stone-900 tracking-tighter leading-[1.05] mb-8 max-w-5xl hero-title">
+                Financial clarity for <span class="text-brand-600 italic font-serif font-light">visionaries</span> and modern teams.
+            </h1>
+            
+            <p class="text-xl text-stone-500 max-w-2xl mb-10 leading-relaxed gs-reveal">
+                Beautifully simple accounting inspired by the best. Manage your personal projects, collaborate with partners, or run an entire company from one focused dashboard.
+            </p>
+            
+            <div class="flex flex-col sm:flex-row gap-4 mb-20 gs-reveal">
+                <button class="magnetic-btn open-pricing-modal px-8 py-4 bg-brand-600 hover:bg-brand-700 text-white rounded-full font-semibold text-lg transition-all shadow-xl shadow-brand-600/20 flex items-center justify-center gap-2 hover:-translate-y-1">
+                    Open Your Dashboard <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                </button>
+                <button class="magnetic-btn px-8 py-4 bg-white border border-stone-200 hover:border-stone-300 hover:bg-stone-50 rounded-full font-semibold text-lg transition-all text-stone-700 flex items-center justify-center gap-2">
+                    <i data-lucide="play-circle" class="w-5 h-5 text-brand-600"></i> See how it works
+                </button>
+            </div>
+
+            <!-- Dashboard Mockup -->
+            <div class="w-full max-w-5xl relative group gs-mockup perspective-1000 hero-parallax" id="hero-parallax">
+                <div class="absolute -inset-1 bg-gradient-to-r from-brand-300 to-brand-100 rounded-[2.5rem] blur-xl opacity-50 group-hover:opacity-70 transition duration-500"></div>
+                <div class="relative bg-white border border-stone-200 rounded-[2rem] shadow-2xl overflow-hidden aspect-[4/5] sm:aspect-[1/1] md:aspect-[16/9] dash-wrapper transition-transform duration-700">
+                    <div class="dash-grid">
+                        <!-- Sidebar -->
+                        <div class="bg-stone-50 border-r border-stone-100 p-6 hidden md:flex flex-col gap-8">
+                            <div class="flex items-center gap-3 mb-4 cursor-pointer group">
+                                <div class="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center text-white shadow-sm transition-transform group-hover:rotate-12">
+                                    <i data-lucide="calculator" class="w-4 h-4"></i>
+                                </div>
+                                <span class="font-bold text-stone-900 tracking-tight">Simple Books</span>
+                            </div>
+                            
+                            <!-- Menu Items -->
+                            <div class="space-y-2 flex-1">
+                                <a href="#" class="dash-menu-item flex items-center gap-3 px-4 py-2.5 bg-brand-50 text-brand-700 rounded-xl font-medium transition-all hover:bg-brand-100">
+                                    <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Overview
+                                </a>
+                                <a href="#" class="dash-menu-item flex items-center gap-3 px-4 py-2.5 text-stone-500 rounded-xl font-medium transition-all hover:bg-stone-100 hover:text-stone-800">
+                                    <i data-lucide="file-text" class="w-4 h-4"></i> Invoices
+                                </a>
+                                <a href="#" class="dash-menu-item flex items-center gap-3 px-4 py-2.5 text-stone-500 rounded-xl font-medium transition-all hover:bg-stone-100 hover:text-stone-800">
+                                    <i data-lucide="pie-chart" class="w-4 h-4"></i> Reports
+                                </a>
+                            </div>
+                            
+                            <!-- Bottom Item -->
+                            <a href="#" class="dash-menu-item flex items-center gap-3 px-4 py-2.5 text-stone-500 rounded-xl font-medium transition-all hover:bg-stone-100 hover:text-stone-800 mt-auto">
+                                <i data-lucide="settings" class="w-4 h-4"></i> Settings
+                            </a>
+                        </div>
+                    
+                        <!-- Main Content -->
+                        <div class="p-4 sm:p-6 md:p-8 flex flex-col gap-4 sm:gap-6 md:gap-8 bg-white overflow-hidden">
+                            <!-- Header -->
+                            <div class="flex justify-between items-start sm:items-center dash-header flex-col sm:flex-row gap-4 sm:gap-0">
+                                <div>
+                                    <h3 class="text-xl sm:text-2xl font-bold text-stone-900 mb-1">Welcome back, Sarah</h3>
+                                    <p class="text-xs sm:text-sm text-stone-500">Here's what's happening with your finances today.</p>
+                                </div>
+                                <div class="flex -space-x-3 hover:space-x-1 transition-all duration-300">
+                                    <div class="w-10 h-10 rounded-full border-2 border-white bg-stone-200 overflow-hidden shadow-sm hover:-translate-y-1 transition-transform">
+                                        <img src="https://i.pravatar.cc/100?img=1" alt="user" class="w-full h-full object-cover">
+                                    </div>
+                                    <div class="w-10 h-10 rounded-full border-2 border-white bg-brand-200 overflow-hidden shadow-sm hover:-translate-y-1 transition-transform">
+                                        <img src="https://i.pravatar.cc/100?img=5" alt="user" class="w-full h-full object-cover">
+                                    </div>
+                                    <div class="w-10 h-10 rounded-full border-2 border-white bg-stone-800 flex items-center justify-center text-xs font-bold text-white shadow-sm hover:-translate-y-1 transition-transform cursor-pointer">+3</div>
+                                </div>
+                            </div>
+                    
+                            <!-- Cards -->
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
+                                <div class="dash-card bg-white rounded-2xl border border-stone-200 p-5 flex flex-col justify-between hover:shadow-lg hover:border-brand-300 transition-all cursor-pointer hover:-translate-y-1">
+                                    <div class="flex justify-between items-start mb-4">
+                                        <div class="p-2 bg-brand-50 text-brand-600 rounded-lg">
+                                            <i data-lucide="trending-up" class="w-5 h-5"></i>
+                                        </div>
+                                        <span class="text-xs font-semibold text-brand-600 bg-brand-50 px-2 py-1 rounded-md">+14%</span>
+                                    </div>
+                                    <div>
+                                        <p class="text-stone-500 text-xs sm:text-sm font-medium mb-1">Total Revenue</p>
+                                        <h4 class="text-lg sm:text-2xl font-bold text-stone-900">$24,500.00</h4>
+                                    </div>
+                                </div>
+                                
+                                <div class="dash-card bg-white rounded-2xl border border-stone-200 p-5 flex flex-col justify-between hover:shadow-lg hover:border-brand-300 transition-all cursor-pointer hover:-translate-y-1">
+                                    <div class="flex justify-between items-start mb-4">
+                                        <div class="p-2 bg-orange-50 text-orange-600 rounded-lg">
+                                            <i data-lucide="clock" class="w-5 h-5"></i>
+                                        </div>
+                                        <span class="text-xs font-semibold text-stone-500 bg-stone-100 px-2 py-1 rounded-md">2 Pending</span>
+                                    </div>
+                                    <div>
+                                        <p class="text-stone-500 text-xs sm:text-sm font-medium mb-1">Unpaid Invoices</p>
+                                        <h4 class="text-lg sm:text-2xl font-bold text-stone-900">$3,240.00</h4>
+                                    </div>
+                                </div>
+                    
+                                <div class="dash-card bg-white rounded-2xl border border-stone-200 p-5 hidden md:flex flex-col justify-between hover:shadow-lg hover:border-brand-300 transition-all cursor-pointer hover:-translate-y-1">
+                                    <div class="flex justify-between items-start mb-4">
+                                        <div class="p-2 bg-blue-50 text-blue-600 rounded-lg">
+                                            <i data-lucide="credit-card" class="w-5 h-5"></i>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <p class="text-stone-500 text-sm font-medium mb-1">Total Expenses</p>
+                                        <h4 class="text-2xl font-bold text-stone-900">$8,120.00</h4>
+                                    </div>
+                                </div>
+                            </div>
+                    
+                            <!-- List/Table Section -->
+                            <div class="flex-1 bg-white rounded-2xl border border-stone-200 p-4 sm:p-5 flex flex-col mt-0 sm:mt-2 dash-list-container overflow-hidden">
+                                <div class="flex justify-between items-center mb-4 sm:mb-6">
+                                    <h4 class="font-bold text-stone-900 text-sm sm:text-base">Recent Transactions</h4>
+                                    <a href="#" class="text-xs sm:text-sm text-brand-600 font-medium hover:text-brand-700">View all</a>
+                                </div>
+                                
+                                <div class="space-y-2 sm:space-y-3 overflow-y-auto hide-scrollbar pr-1">
+                                    <div class="dash-list-item flex items-center justify-between p-3 rounded-xl hover:bg-stone-50 transition-colors cursor-pointer border border-transparent hover:border-stone-100">
+                                        <div class="flex items-center gap-4">
+                                            <div class="w-10 h-10 bg-stone-100 rounded-full flex items-center justify-center text-stone-600">
+                                                <i data-lucide="monitor" class="w-4 h-4"></i>
+                                            </div>
+                                            <div>
+                                                <p class="font-semibold text-stone-900 text-sm">Apple Store</p>
+                                                <p class="text-xs text-stone-500">Equipment</p>
+                                            </div>
+                                        </div>
+                                        <div class="text-right">
+                                            <p class="font-semibold text-stone-900 text-sm">-$1,299.00</p>
+                                            <p class="text-xs text-stone-500">Today</p>
+                                        </div>
+                                    </div>
+                    
+                                    <div class="dash-list-item flex items-center justify-between p-3 rounded-xl hover:bg-stone-50 transition-colors cursor-pointer border border-transparent hover:border-stone-100">
+                                        <div class="flex items-center gap-4">
+                                            <div class="w-10 h-10 bg-brand-50 rounded-full flex items-center justify-center text-brand-600">
+                                                <i data-lucide="arrow-down-left" class="w-4 h-4"></i>
+                                            </div>
+                                            <div>
+                                                <p class="font-semibold text-stone-900 text-sm">Stripe Payout</p>
+                                                <p class="text-xs text-stone-500">Income</p>
+                                            </div>
+                                        </div>
+                                        <div class="text-right">
+                                            <p class="font-semibold text-brand-600 text-sm">+$4,200.00</p>
+                                            <p class="text-xs text-stone-500">Yesterday</p>
+                                        </div>
+                                    </div>
+                    
+                                    <div class="dash-list-item flex items-center justify-between p-3 rounded-xl hover:bg-stone-50 transition-colors cursor-pointer border border-transparent hover:border-stone-100">
+                                        <div class="flex items-center gap-4">
+                                            <div class="w-10 h-10 bg-stone-100 rounded-full flex items-center justify-center text-stone-600">
+                                                <i data-lucide="coffee" class="w-4 h-4"></i>
+                                            </div>
+                                            <div>
+                                                <p class="font-semibold text-stone-900 text-sm">Starbucks</p>
+                                                <p class="text-xs text-stone-500">Meals & Entertainment</p>
+                                            </div>
+                                        </div>
+                                        <div class="text-right">
+                                            <p class="font-semibold text-stone-900 text-sm">-$12.50</p>
+                                            <p class="text-xs text-stone-500">Aug 24</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Logo Marquee -->
+    <div class="w-full border-y border-stone-200 bg-white py-12 overflow-hidden relative z-20">
+        <p class="text-center text-xs font-semibold text-stone-400 uppercase tracking-widest mb-8">Trusted by innovative teams</p>
+        <div class="flex whitespace-nowrap opacity-60 grayscale hover:grayscale-0 transition-all duration-700 marquee-wrapper">
+            <div class="flex gap-20 items-center px-10 marquee-track shrink-0">
+                <div class="flex items-center gap-2"><i data-lucide="layers" class="w-8 h-8"></i><span class="text-2xl font-bold tracking-tighter">Framer</span></div>
+                <div class="flex items-center gap-2"><i data-lucide="pen-tool" class="w-8 h-8"></i><span class="text-2xl font-bold tracking-tighter">Figma</span></div>
+                <div class="flex items-center gap-2"><i data-lucide="hash" class="w-8 h-8"></i><span class="text-2xl font-bold tracking-tighter">Slack</span></div>
+                <div class="flex items-center gap-2"><i data-lucide="code" class="w-8 h-8"></i><span class="text-2xl font-bold tracking-tighter">GitHub</span></div>
+                <div class="flex items-center gap-2"><i data-lucide="aperture" class="w-8 h-8"></i><span class="text-2xl font-bold tracking-tighter">Dribbble</span></div>
+                <div class="flex items-center gap-2"><i data-lucide="monitor-play" class="w-8 h-8"></i><span class="text-2xl font-bold tracking-tighter">Twitch</span></div>
+            </div>
+            <div class="flex gap-20 items-center px-10 marquee-track shrink-0">
+                <div class="flex items-center gap-2"><i data-lucide="layers" class="w-8 h-8"></i><span class="text-2xl font-bold tracking-tighter">Framer</span></div>
+                <div class="flex items-center gap-2"><i data-lucide="pen-tool" class="w-8 h-8"></i><span class="text-2xl font-bold tracking-tighter">Figma</span></div>
+                <div class="flex items-center gap-2"><i data-lucide="hash" class="w-8 h-8"></i><span class="text-2xl font-bold tracking-tighter">Slack</span></div>
+                <div class="flex items-center gap-2"><i data-lucide="code" class="w-8 h-8"></i><span class="text-2xl font-bold tracking-tighter">GitHub</span></div>
+                <div class="flex items-center gap-2"><i data-lucide="aperture" class="w-8 h-8"></i><span class="text-2xl font-bold tracking-tighter">Dribbble</span></div>
+                <div class="flex items-center gap-2"><i data-lucide="monitor-play" class="w-8 h-8"></i><span class="text-2xl font-bold tracking-tighter">Twitch</span></div>
+            </div>
+            <div class="flex gap-20 items-center px-10 marquee-track shrink-0">
+                <div class="flex items-center gap-2"><i data-lucide="layers" class="w-8 h-8"></i><span class="text-2xl font-bold tracking-tighter">Framer</span></div>
+                <div class="flex items-center gap-2"><i data-lucide="pen-tool" class="w-8 h-8"></i><span class="text-2xl font-bold tracking-tighter">Figma</span></div>
+                <div class="flex items-center gap-2"><i data-lucide="hash" class="w-8 h-8"></i><span class="text-2xl font-bold tracking-tighter">Slack</span></div>
+                <div class="flex items-center gap-2"><i data-lucide="code" class="w-8 h-8"></i><span class="text-2xl font-bold tracking-tighter">GitHub</span></div>
+                <div class="flex items-center gap-2"><i data-lucide="aperture" class="w-8 h-8"></i><span class="text-2xl font-bold tracking-tighter">Dribbble</span></div>
+                <div class="flex items-center gap-2"><i data-lucide="monitor-play" class="w-8 h-8"></i><span class="text-2xl font-bold tracking-tighter">Twitch</span></div>
+            </div>
+            <div class="flex gap-20 items-center px-10 marquee-track shrink-0">
+                <div class="flex items-center gap-2"><i data-lucide="layers" class="w-8 h-8"></i><span class="text-2xl font-bold tracking-tighter">Framer</span></div>
+                <div class="flex items-center gap-2"><i data-lucide="pen-tool" class="w-8 h-8"></i><span class="text-2xl font-bold tracking-tighter">Figma</span></div>
+                <div class="flex items-center gap-2"><i data-lucide="hash" class="w-8 h-8"></i><span class="text-2xl font-bold tracking-tighter">Slack</span></div>
+                <div class="flex items-center gap-2"><i data-lucide="code" class="w-8 h-8"></i><span class="text-2xl font-bold tracking-tighter">GitHub</span></div>
+                <div class="flex items-center gap-2"><i data-lucide="aperture" class="w-8 h-8"></i><span class="text-2xl font-bold tracking-tighter">Dribbble</span></div>
+                <div class="flex items-center gap-2"><i data-lucide="monitor-play" class="w-8 h-8"></i><span class="text-2xl font-bold tracking-tighter">Twitch</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Showcase Gallery -->
+    <section class="py-24 overflow-hidden bg-stone-50 border-b border-stone-200 relative">
+        <div class="absolute inset-y-0 left-0 w-16 md:w-48 bg-gradient-to-r from-stone-50 to-transparent z-10 pointer-events-none"></div>
+        <div class="absolute inset-y-0 right-0 w-16 md:w-48 bg-gradient-to-l from-stone-50 to-transparent z-10 pointer-events-none"></div>
+        
+        <div class="max-w-7xl mx-auto px-6 mb-16 text-center">
+            <h2 class="text-3xl md:text-5xl font-bold text-stone-900 mb-6 tracking-tight">The beauty of organization</h2>
+            <p class="text-stone-500 max-w-2xl mx-auto text-lg">Experience a workspace designed for clarity, giving you the peace of mind to focus on what truly matters.</p>
+        </div>
+
+        <div class="flex whitespace-nowrap image-marquee-wrapper pl-6">
+            <div class="flex gap-6 items-center image-marquee-track shrink-0 pr-6">
+                <div class="w-[300px] md:w-[450px] aspect-[4/3] rounded-3xl overflow-hidden shrink-0 group relative shadow-xl border border-stone-200/50">
+                    <img src="./images/founder.png" alt="Founder working" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                    <div class="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-500"></div>
+                </div>
+                <div class="w-[300px] md:w-[450px] aspect-[4/3] rounded-3xl overflow-hidden shrink-0 group relative shadow-xl border border-stone-200/50">
+                    <img src="./images/abstract.png" alt="Abstract structure" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                    <div class="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-500"></div>
+                </div>
+                <div class="w-[300px] md:w-[450px] aspect-[4/3] rounded-3xl overflow-hidden shrink-0 group relative shadow-xl border border-stone-200/50">
+                    <img src="./images/team.png" alt="Collaborative team" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                    <div class="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-500"></div>
+                </div>
+                <div class="w-[300px] md:w-[450px] aspect-[4/3] rounded-3xl overflow-hidden shrink-0 group relative shadow-xl border border-stone-200/50">
+                    <img src="./images/workspace.png" alt="Pristine workspace" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                    <div class="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-500"></div>
+                </div>
+                <div class="w-[300px] md:w-[450px] aspect-[4/3] rounded-3xl overflow-hidden shrink-0 group relative shadow-xl border border-stone-200/50">
+                    <img src="./images/mobile.png" alt="Mobile experience" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                    <div class="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-500"></div>
+                </div>
+            </div>
+            <!-- Duplicate for infinite scroll -->
+            <div class="flex gap-6 items-center image-marquee-track shrink-0 pr-6">
+                <div class="w-[300px] md:w-[450px] aspect-[4/3] rounded-3xl overflow-hidden shrink-0 group relative shadow-xl border border-stone-200/50">
+                    <img src="./images/founder.png" alt="Founder working" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                    <div class="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-500"></div>
+                </div>
+                <div class="w-[300px] md:w-[450px] aspect-[4/3] rounded-3xl overflow-hidden shrink-0 group relative shadow-xl border border-stone-200/50">
+                    <img src="./images/abstract.png" alt="Abstract structure" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                    <div class="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-500"></div>
+                </div>
+                <div class="w-[300px] md:w-[450px] aspect-[4/3] rounded-3xl overflow-hidden shrink-0 group relative shadow-xl border border-stone-200/50">
+                    <img src="./images/team.png" alt="Collaborative team" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                    <div class="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-500"></div>
+                </div>
+                <div class="w-[300px] md:w-[450px] aspect-[4/3] rounded-3xl overflow-hidden shrink-0 group relative shadow-xl border border-stone-200/50">
+                    <img src="./images/workspace.png" alt="Pristine workspace" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                    <div class="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-500"></div>
+                </div>
+                <div class="w-[300px] md:w-[450px] aspect-[4/3] rounded-3xl overflow-hidden shrink-0 group relative shadow-xl border border-stone-200/50">
+                    <img src="./images/mobile.png" alt="Mobile experience" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                    <div class="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-500"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Collaborative Section -->
+    <section id="collaboration" class="py-24 md:py-32 px-6 bg-white">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-20 section-header">
+                <h2 class="text-brand-600 font-semibold tracking-wide uppercase text-sm mb-3">Designed for Growth</h2>
+                <h3 class="text-3xl md:text-5xl font-bold text-stone-900 mb-6 tracking-tight">Work alone, or bring everyone.</h3>
+                <p class="text-stone-500 max-w-2xl mx-auto text-lg">One unified platform that scales from your first side-hustle to a multi-department enterprise. Hover over each option to see how it works.</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Card 1 -->
+                <div class="hover-card bg-stone-50 border border-stone-100 rounded-[2rem] p-8 cursor-default group">
+                    <div class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-brand-600 shadow-sm mb-6 group-hover:scale-110 transition-transform duration-300">
+                        <i data-lucide="user" class="w-7 h-7"></i>
+                    </div>
+                    <h4 class="text-2xl font-bold text-stone-900 mb-3">Personal Projects</h4>
+                    <p class="text-stone-500 leading-relaxed">Keep your personal burn rate and side-hustle expenses separated but organized in one clean interface.</p>
+                    
+                    <div class="hover-reveal">
+                        <div class="pt-4 mt-2 border-t border-stone-200">
+                            <ul class="space-y-3">
+                                <li class="flex items-center gap-2 text-sm text-stone-700">
+                                    <i data-lucide="check-circle-2" class="w-4 h-4 text-brand-500"></i> Auto-receipt scanning
+                                </li>
+                                <li class="flex items-center gap-2 text-sm text-stone-700">
+                                    <i data-lucide="check-circle-2" class="w-4 h-4 text-brand-500"></i> Personal tax estimations
+                                </li>
+                                <li class="flex items-center gap-2 text-sm text-stone-700">
+                                    <i data-lucide="check-circle-2" class="w-4 h-4 text-brand-500"></i> Bank account sync
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="hover-card bg-stone-50 border border-stone-100 rounded-[2rem] p-8 cursor-default group relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-brand-100 rounded-bl-full -z-10 opacity-50 group-hover:scale-150 transition-transform duration-700"></div>
+                    <div class="w-14 h-14 bg-brand-600 rounded-2xl flex items-center justify-center text-white shadow-md mb-6 group-hover:scale-110 transition-transform duration-300">
+                        <i data-lucide="users" class="w-7 h-7"></i>
+                    </div>
+                    <h4 class="text-2xl font-bold text-stone-900 mb-3">Team Collaboration</h4>
+                    <p class="text-stone-500 leading-relaxed">Invite your business partner or employees. Assign roles and see who made which entry in real-time.</p>
+                    
+                    <div class="hover-reveal">
+                        <div class="pt-4 mt-2 border-t border-stone-200">
+                            <ul class="space-y-3">
+                                <li class="flex items-center gap-2 text-sm text-stone-700">
+                                    <i data-lucide="check-circle-2" class="w-4 h-4 text-brand-500"></i> Granular permissions
+                                </li>
+                                <li class="flex items-center gap-2 text-sm text-stone-700">
+                                    <i data-lucide="check-circle-2" class="w-4 h-4 text-brand-500"></i> Real-time ledger sync
+                                </li>
+                                <li class="flex items-center gap-2 text-sm text-stone-700">
+                                    <i data-lucide="check-circle-2" class="w-4 h-4 text-brand-500"></i> Built-in chat & notes
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="hover-card bg-stone-50 border border-stone-100 rounded-[2rem] p-8 cursor-default group">
+                    <div class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-stone-800 shadow-sm mb-6 group-hover:scale-110 transition-transform duration-300">
+                        <i data-lucide="building-2" class="w-7 h-7"></i>
+                    </div>
+                    <h4 class="text-2xl font-bold text-stone-900 mb-3">Company Scalability</h4>
+                    <p class="text-stone-500 leading-relaxed">Full multi-entity support. Connect multiple tax IDs and switch between companies with one click.</p>
+                    
+                    <div class="hover-reveal">
+                        <div class="pt-4 mt-2 border-t border-stone-200">
+                            <ul class="space-y-3">
+                                <li class="flex items-center gap-2 text-sm text-stone-700">
+                                    <i data-lucide="check-circle-2" class="w-4 h-4 text-brand-500"></i> Consolidated reporting
+                                </li>
+                                <li class="flex items-center gap-2 text-sm text-stone-700">
+                                    <i data-lucide="check-circle-2" class="w-4 h-4 text-brand-500"></i> Multi-currency support
+                                </li>
+                                <li class="flex items-center gap-2 text-sm text-stone-700">
+                                    <i data-lucide="check-circle-2" class="w-4 h-4 text-brand-500"></i> API access & Webhooks
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Deep Dive Features -->
+    <section id="features" class="py-24 md:py-32 px-6 bg-stone-900 text-white rounded-[3rem] mx-4 md:mx-10 my-10 relative overflow-hidden">
+        <!-- Abstract background elements -->
+        <div class="absolute top-0 right-0 w-96 h-96 bg-brand-500 rounded-full mix-blend-screen filter blur-[120px] opacity-20"></div>
+        <div class="absolute bottom-0 left-0 w-96 h-96 bg-emerald-700 rounded-full mix-blend-screen filter blur-[120px] opacity-20"></div>
+
+        <div class="max-w-7xl mx-auto relative z-10">
+            <div class="flex flex-col lg:flex-row gap-16 items-center">
+                <div class="lg:w-1/2 section-header-dark">
+                    <h2 class="text-brand-400 font-semibold tracking-wide uppercase text-sm mb-3">Smart Automation</h2>
+                    <h3 class="text-3xl md:text-5xl font-bold mb-6 tracking-tight">Focus on the work,<br/>not the paperwork.</h3>
+                    <p class="text-stone-400 text-lg mb-10 leading-relaxed">We've automated the tedious parts of accounting. Connect your bank, and our intelligent engine categorizes expenses, matches receipts, and prepares your books for tax season automatically.</p>
+                    
+                    <div class="space-y-6">
+                        <div class="flex gap-4 group cursor-pointer hover:bg-stone-800 p-4 -ml-4 rounded-2xl transition-colors">
+                            <div class="w-12 h-12 bg-brand-900/50 rounded-xl flex items-center justify-center text-brand-400 shrink-0 group-hover:bg-brand-600 group-hover:text-white transition-colors">
+                                <i data-lucide="zap" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <h5 class="text-xl font-bold mb-1">Instant Bank Sync</h5>
+                                <p class="text-stone-400 text-sm">Connect to over 10,000 global financial institutions securely.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4 group cursor-pointer hover:bg-stone-800 p-4 -ml-4 rounded-2xl transition-colors">
+                            <div class="w-12 h-12 bg-brand-900/50 rounded-xl flex items-center justify-center text-brand-400 shrink-0 group-hover:bg-brand-600 group-hover:text-white transition-colors">
+                                <i data-lucide="file-text" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <h5 class="text-xl font-bold mb-1">Smart Invoicing</h5>
+                                <p class="text-stone-400 text-sm">Send professional invoices that get paid 3x faster with integrated payments.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4 group cursor-pointer hover:bg-stone-800 p-4 -ml-4 rounded-2xl transition-colors">
+                            <div class="w-12 h-12 bg-brand-900/50 rounded-xl flex items-center justify-center text-brand-400 shrink-0 group-hover:bg-brand-600 group-hover:text-white transition-colors">
+                                <i data-lucide="pie-chart" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <h5 class="text-xl font-bold mb-1">Tax-Ready Reports</h5>
+                                <p class="text-stone-400 text-sm">Generate P&L, Balance Sheets, and Cash Flow statements with one click.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="lg:w-1/2 w-full perspective-container">
+                    <div class="grid grid-cols-2 gap-4 auto-rows-fr">
+                        <!-- Stat Card 1 -->
+                        <div class="bg-stone-800/50 border border-stone-700/50 backdrop-blur-md rounded-3xl p-6 flex flex-col justify-between hover:bg-stone-800 transition-colors feature-card-anim">
+                            <div class="w-10 h-10 bg-brand-500/20 rounded-full flex items-center justify-center text-brand-400 mb-8">
+                                <i data-lucide="arrow-up-right" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <div class="text-3xl font-bold text-white mb-1">14.2%</div>
+                                <div class="text-stone-400 text-sm">Average revenue growth for users in first year</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Stat Card 2 -->
+                        <div class="bg-brand-600 rounded-3xl p-6 flex flex-col justify-between feature-card-anim relative overflow-hidden">
+                            <div class="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+                            <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center text-white mb-8">
+                                <i data-lucide="clock" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <div class="text-3xl font-bold text-white mb-1">40hrs</div>
+                                <div class="text-brand-100 text-sm">Saved per month on manual bookkeeping</div>
+                            </div>
+                        </div>
+
+                        <!-- Full Width Image / Graph placeholder -->
+                        <div class="col-span-2 bg-stone-800/50 border border-stone-700/50 backdrop-blur-md rounded-3xl p-6 h-48 feature-card-anim flex flex-col justify-between group">
+                            <div class="flex justify-between items-center mb-4">
+                                <h4 class="font-semibold text-stone-300">Live Cash Flow</h4>
+                                <span class="px-2 py-1 bg-brand-500/20 text-brand-400 text-xs rounded-md">Real-time</span>
+                            </div>
+                            <div class="flex items-end gap-2 h-24 opacity-70 group-hover:opacity-100 transition-opacity">
+                                <!-- Fake Bars -->
+                                <div class="w-full bg-stone-700 rounded-t-sm h-[30%] hover:bg-brand-500 transition-colors"></div>
+                                <div class="w-full bg-stone-700 rounded-t-sm h-[50%] hover:bg-brand-500 transition-colors"></div>
+                                <div class="w-full bg-stone-700 rounded-t-sm h-[40%] hover:bg-brand-500 transition-colors"></div>
+                                <div class="w-full bg-stone-700 rounded-t-sm h-[70%] hover:bg-brand-500 transition-colors"></div>
+                                <div class="w-full bg-brand-500 rounded-t-sm h-[90%] shadow-[0_0_15px_rgba(34,197,94,0.4)]"></div>
+                                <div class="w-full bg-stone-700 rounded-t-sm h-[60%] hover:bg-brand-500 transition-colors"></div>
+                                <div class="w-full bg-stone-700 rounded-t-sm h-[80%] hover:bg-brand-500 transition-colors"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Interactive Details Section -->
+    <section class="py-24 bg-stone-50 px-6 border-y border-stone-200">
+        <div class="max-w-4xl mx-auto text-center">
+            <h2 class="text-3xl md:text-4xl font-bold text-stone-900 mb-12">Built for every financial role</h2>
+            
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="group bg-white p-8 rounded-3xl border border-stone-200 hover:border-brand-300 hover:shadow-xl transition-all duration-300 cursor-pointer">
+                    <div class="w-16 h-16 mx-auto bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i data-lucide="briefcase" class="w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-stone-900 mb-2">The Founder</h3>
+                    <p class="text-stone-500 text-sm">Monitor high-level metrics, cash runway, and overall business health at a glance.</p>
+                </div>
+                
+                <div class="group bg-white p-8 rounded-3xl border border-stone-200 hover:border-brand-300 hover:shadow-xl transition-all duration-300 cursor-pointer">
+                    <div class="w-16 h-16 mx-auto bg-brand-50 text-brand-600 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i data-lucide="calculator" class="w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-stone-900 mb-2">The Accountant</h3>
+                    <p class="text-stone-500 text-sm">Deep dive into ledgers, reconcile anomalies, and export CPA-friendly reports.</p>
+                </div>
+
+                <div class="group bg-white p-8 rounded-3xl border border-stone-200 hover:border-brand-300 hover:shadow-xl transition-all duration-300 cursor-pointer">
+                    <div class="w-16 h-16 mx-auto bg-purple-50 text-purple-600 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i data-lucide="shield-check" class="w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-stone-900 mb-2">The Manager</h3>
+                    <p class="text-stone-500 text-sm">Approve team expenses, manage vendor payouts, and control departmental budgets.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="reviews" class="py-24 bg-white px-6 border-b border-stone-200">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16 section-header">
+                <h2 class="text-brand-600 font-semibold tracking-wide uppercase text-sm mb-3">Wall of Love</h2>
+                <h3 class="text-3xl md:text-5xl font-bold text-stone-900 mb-6 tracking-tight">Don't just take our word for it.</h3>
+                <p class="text-stone-500 max-w-2xl mx-auto text-lg">See how SimpleBooks is helping founders and teams regain control of their financial operations.</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6 lg:gap-8">
+                <!-- Review 1 -->
+                <div class="review-card flex flex-col bg-stone-50 border border-stone-100 p-8 rounded-3xl hover:border-brand-200 hover:shadow-xl transition-all duration-300 group">
+                    <div class="flex gap-1 mb-6 text-brand-500">
+                        <i data-lucide="star" class="w-5 h-5 fill-current group-hover:scale-110 transition-transform delay-[0ms]"></i>
+                        <i data-lucide="star" class="w-5 h-5 fill-current group-hover:scale-110 transition-transform delay-[50ms]"></i>
+                        <i data-lucide="star" class="w-5 h-5 fill-current group-hover:scale-110 transition-transform delay-[100ms]"></i>
+                        <i data-lucide="star" class="w-5 h-5 fill-current group-hover:scale-110 transition-transform delay-[150ms]"></i>
+                        <i data-lucide="star" class="w-5 h-5 fill-current group-hover:scale-110 transition-transform delay-[200ms]"></i>
+                    </div>
+                    <p class="text-stone-700 text-lg mb-8 leading-relaxed">"Before SimpleBooks, our accounting was a mess of spreadsheets and loose receipts. Now, our entire team collaborates on a single dashboard. It's completely transformed how we view our cash flow."</p>
+                    <div class="flex items-center gap-4 mt-auto">
+                        <img src="https://i.pravatar.cc/100?img=12" alt="Marcus Chen" class="w-12 h-12 rounded-full border-2 border-white shadow-sm object-cover">
+                        <div>
+                            <h4 class="font-bold text-stone-900 tracking-tight">Marcus Chen</h4>
+                            <p class="text-sm text-stone-500">Founder, Design Co.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Review 2 -->
+                <div class="review-card flex flex-col bg-stone-50 border border-stone-100 p-8 rounded-3xl hover:border-brand-200 hover:shadow-xl transition-all duration-300 group">
+                    <div class="flex gap-1 mb-6 text-brand-500">
+                        <i data-lucide="star" class="w-5 h-5 fill-current group-hover:scale-110 transition-transform delay-[0ms]"></i>
+                        <i data-lucide="star" class="w-5 h-5 fill-current group-hover:scale-110 transition-transform delay-[50ms]"></i>
+                        <i data-lucide="star" class="w-5 h-5 fill-current group-hover:scale-110 transition-transform delay-[100ms]"></i>
+                        <i data-lucide="star" class="w-5 h-5 fill-current group-hover:scale-110 transition-transform delay-[150ms]"></i>
+                        <i data-lucide="star" class="w-5 h-5 fill-current group-hover:scale-110 transition-transform delay-[200ms]"></i>
+                    </div>
+                    <p class="text-stone-700 text-lg mb-8 leading-relaxed">"The auto-reconciliation feature alone saves my firm 20 hours a week. SimpleBooks strikes the perfect balance between being robust enough for accountants and intuitive enough for my clients."</p>
+                    <div class="flex items-center gap-4 mt-auto">
+                        <img src="https://i.pravatar.cc/100?img=47" alt="Sarah Jenkins" class="w-12 h-12 rounded-full border-2 border-white shadow-sm object-cover">
+                        <div>
+                            <h4 class="font-bold text-stone-900 tracking-tight">Sarah Jenkins</h4>
+                            <p class="text-sm text-stone-500">Managing Partner, CPA</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Review 3 -->
+                <div class="review-card flex flex-col bg-stone-50 border border-stone-100 p-8 rounded-3xl hover:border-brand-200 hover:shadow-xl transition-all duration-300 group">
+                    <div class="flex gap-1 mb-6 text-brand-500">
+                        <i data-lucide="star" class="w-5 h-5 fill-current group-hover:scale-110 transition-transform delay-[0ms]"></i>
+                        <i data-lucide="star" class="w-5 h-5 fill-current group-hover:scale-110 transition-transform delay-[50ms]"></i>
+                        <i data-lucide="star" class="w-5 h-5 fill-current group-hover:scale-110 transition-transform delay-[100ms]"></i>
+                        <i data-lucide="star" class="w-5 h-5 fill-current group-hover:scale-110 transition-transform delay-[150ms]"></i>
+                        <i data-lucide="star" class="w-5 h-5 fill-current group-hover:scale-110 transition-transform delay-[200ms]"></i>
+                    </div>
+                    <p class="text-stone-700 text-lg mb-8 leading-relaxed">"I used to dread tax season. Since switching over, everything is automatically categorized and export-ready. The interface is absolutely stunning, making financial work actually enjoyable."</p>
+                    <div class="flex items-center gap-4 mt-auto">
+                        <img src="https://i.pravatar.cc/100?img=33" alt="David Reynolds" class="w-12 h-12 rounded-full border-2 border-white shadow-sm object-cover">
+                        <div>
+                            <h4 class="font-bold text-stone-900 tracking-tight">David Reynolds</h4>
+                            <p class="text-sm text-stone-500">Freelance Developer</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="py-24 bg-stone-50 px-6 border-y border-stone-200">
+        <div class="max-w-3xl mx-auto">
+            <div class="text-center mb-16 section-header">
+                <h2 class="text-brand-600 font-semibold tracking-wide uppercase text-sm mb-3">FAQ</h2>
+                <h3 class="text-3xl md:text-5xl font-bold text-stone-900 mb-6 tracking-tight">Questions, answered.</h3>
+                <p class="text-stone-500 text-lg max-w-xl mx-auto">Everything you need to know before you get started.</p>
+            </div>
+
+            <div class="divide-y divide-stone-200 border border-stone-200 rounded-3xl bg-white overflow-hidden">
+                <div class="faq-item">
+                    <button class="faq-trigger w-full flex items-center justify-between gap-6 p-7 text-left">
+                        <span class="font-semibold text-stone-900 text-lg">Is Simple Books really free to start?</span>
+                        <div class="faq-icon w-8 h-8 rounded-full border border-stone-200 flex items-center justify-center shrink-0 text-stone-500">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                        </div>
+                    </button>
+                    <div class="faq-answer">
+                        <p class="px-7 pb-7 text-stone-500 leading-relaxed">Yes. Our Free Starter plan is completely free with no credit card required. You get access to core income &amp; expense tracking for 1 user, and up to 5 invoices per month. Upgrade anytime as your business grows.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-trigger w-full flex items-center justify-between gap-6 p-7 text-left">
+                        <span class="font-semibold text-stone-900 text-lg">How does bank synchronization work?</span>
+                        <div class="faq-icon w-8 h-8 rounded-full border border-stone-200 flex items-center justify-center shrink-0 text-stone-500">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                        </div>
+                    </button>
+                    <div class="faq-answer">
+                        <p class="px-7 pb-7 text-stone-500 leading-relaxed">We connect to over 10,000 financial institutions worldwide using bank-level 256-bit SSL encryption. Once linked, transactions are imported automatically and our AI engine categorizes them instantly — no manual data entry required.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-trigger w-full flex items-center justify-between gap-6 p-7 text-left">
+                        <span class="font-semibold text-stone-900 text-lg">Can I invite my accountant or team members?</span>
+                        <div class="faq-icon w-8 h-8 rounded-full border border-stone-200 flex items-center justify-center shrink-0 text-stone-500">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                        </div>
+                    </button>
+                    <div class="faq-answer">
+                        <p class="px-7 pb-7 text-stone-500 leading-relaxed">Absolutely. From the Simple Start plan upward, you can invite your accountant with read-only or full access. The Essentials plan supports up to 3 users with granular role-based permissions — owner, admin, or bookkeeper.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-trigger w-full flex items-center justify-between gap-6 p-7 text-left">
+                        <span class="font-semibold text-stone-900 text-lg">What reports can I export for tax time?</span>
+                        <div class="faq-icon w-8 h-8 rounded-full border border-stone-200 flex items-center justify-center shrink-0 text-stone-500">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                        </div>
+                    </button>
+                    <div class="faq-answer">
+                        <p class="px-7 pb-7 text-stone-500 leading-relaxed">With a single click you can export Profit &amp; Loss statements, Balance Sheets, Cash Flow reports, and a full transaction ledger — all in PDF or CSV format, formatted to be CPA-ready and compliant with major accounting standards.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-trigger w-full flex items-center justify-between gap-6 p-7 text-left">
+                        <span class="font-semibold text-stone-900 text-lg">Can I cancel my subscription at any time?</span>
+                        <div class="faq-icon w-8 h-8 rounded-full border border-stone-200 flex items-center justify-center shrink-0 text-stone-500">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                        </div>
+                    </button>
+                    <div class="faq-answer">
+                        <p class="px-7 pb-7 text-stone-500 leading-relaxed">Yes — no lock-in contracts, ever. You can cancel from your account settings at any time and your data will remain accessible until the end of your billing period. We also offer a full data export before you leave.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-32 px-6 bg-white relative">
+        <div class="max-w-5xl mx-auto bg-brand-600 rounded-[3rem] p-12 md:p-20 text-center relative overflow-hidden transform-gpu cta-box">
+            <!-- Decorative Elements -->
+            <div class="absolute top-0 right-0 w-80 h-80 bg-white opacity-10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+            <div class="absolute bottom-0 left-0 w-80 h-80 bg-brand-300 opacity-20 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
+            
+            <h2 class="text-4xl md:text-6xl font-bold text-white mb-6 relative z-10 tracking-tight">Ready for financial clarity?</h2>
+            <p class="text-brand-100 text-lg md:text-xl mb-12 max-w-2xl mx-auto relative z-10">
+                Join thousands of modern businesses who have traded chaos for control. Setup takes less than 5 minutes.
+            </p>
+            
+            <div class="flex flex-col sm:flex-row gap-4 justify-center relative z-10">
+                <button class="open-pricing-modal px-8 py-4 bg-white text-brand-700 rounded-full font-bold text-lg hover:bg-stone-50 transition-all shadow-xl hover:-translate-y-1">
+                    Start Your 14-Day Free Trial
+                </button>
+                <button class="px-8 py-4 bg-transparent border-2 border-white/30 text-white rounded-full font-bold text-lg hover:bg-white/10 transition-all">
+                    Talk to Sales
+                </button>
+            </div>
+            <p class="mt-6 text-brand-200 text-sm relative z-10">No credit card required. Cancel anytime.</p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-white pt-16 pb-8 px-6 border-t border-stone-200">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-12 mb-16">
+            <div class="md:col-span-4">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center text-white font-bold">
+                        <i data-lucide="calculator" class="w-4 h-4"></i>
+                    </div>
+                    <span class="text-lg font-bold tracking-tight text-stone-900">Simple Books</span>
+                </div>
+                <p class="text-stone-500 text-sm leading-relaxed max-w-xs mb-6">
+                    Making financial management as simple as reading a book. Built for modern teams who value design and functionality.
+                </p>
+                <div class="flex gap-4">
+                    <a href="#" class="w-10 h-10 rounded-full bg-stone-100 flex items-center justify-center text-stone-600 hover:bg-brand-50 hover:text-brand-600 transition-colors">
+                        <i data-lucide="twitter" class="w-4 h-4"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 rounded-full bg-stone-100 flex items-center justify-center text-stone-600 hover:bg-brand-50 hover:text-brand-600 transition-colors">
+                        <i data-lucide="linkedin" class="w-4 h-4"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="md:col-span-2 md:col-start-7">
+                <h4 class="font-bold text-stone-900 mb-4">Product</h4>
+                <ul class="space-y-3 text-sm text-stone-500">
+                    <li><a href="#" class="hover:text-brand-600 transition-colors">Features</a></li>
+                    <li><a href="#" class="hover:text-brand-600 transition-colors">Invoicing</a></li>
+                    <li><a href="#" class="hover:text-brand-600 transition-colors">Payroll</a></li>
+                    <li><a href="#" class="hover:text-brand-600 transition-colors">Pricing</a></li>
+                </ul>
+            </div>
+
+            <div class="md:col-span-2">
+                <h4 class="font-bold text-stone-900 mb-4">Resources</h4>
+                <ul class="space-y-3 text-sm text-stone-500">
+                    <li><a href="#" class="hover:text-brand-600 transition-colors">Blog</a></li>
+                    <li><a href="#" class="hover:text-brand-600 transition-colors">Help Center</a></li>
+                    <li><a href="#" class="hover:text-brand-600 transition-colors">Guides</a></li>
+                    <li><a href="#" class="hover:text-brand-600 transition-colors">API Docs</a></li>
+                </ul>
+            </div>
+
+            <div class="md:col-span-2">
+                <h4 class="font-bold text-stone-900 mb-4">Company</h4>
+                <ul class="space-y-3 text-sm text-stone-500">
+                    <li><a href="#" class="hover:text-brand-600 transition-colors">About Us</a></li>
+                    <li><a href="#" class="hover:text-brand-600 transition-colors">Careers</a></li>
+                    <li><a href="#" class="hover:text-brand-600 transition-colors">Legal</a></li>
+                    <li><a href="#" class="hover:text-brand-600 transition-colors">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="max-w-7xl mx-auto pt-8 border-t border-stone-200 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-stone-400">
+            <p>&copy; 2026 Simple Books Inc. All rights reserved.</p>
+            <div class="flex gap-6">
+                <a href="#" class="hover:text-stone-600 transition-colors">Privacy Policy</a>
+                <a href="#" class="hover:text-stone-600 transition-colors">Terms of Service</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // GSAP Animations
+        document.addEventListener('DOMContentLoaded', () => {
+            // Register ScrollTrigger
+            gsap.registerPlugin(ScrollTrigger);
+
+            // Lenis Smooth Scroll
+            const lenis = new Lenis({
+                duration: 1.2,
+                easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+                direction: 'vertical',
+                gestureDirection: 'vertical',
+                smooth: true,
+                mouseMultiplier: 1,
+                smoothTouch: false,
+                touchMultiplier: 2,
+                infinite: false,
+            });
+
+            function raf(time) {
+                lenis.raf(time);
+                requestAnimationFrame(raf);
+            }
+            requestAnimationFrame(raf);
+
+
+            // Magnetic Buttons
+            const magneticBtns = document.querySelectorAll('.magnetic-btn');
+            magneticBtns.forEach(btn => {
+                btn.addEventListener('mousemove', (e) => {
+                    const rect = btn.getBoundingClientRect();
+                    const x = e.clientX - rect.left - rect.width / 2;
+                    const y = e.clientY - rect.top - rect.height / 2;
+                    
+                    gsap.to(btn, {
+                        x: x * 0.2,
+                        y: y * 0.2,
+                        duration: 0.6,
+                        ease: "power3.out"
+                    });
+                });
+                
+                btn.addEventListener('mouseleave', () => {
+                    gsap.to(btn, {
+                        x: 0,
+                        y: 0,
+                        duration: 0.6,
+                        ease: "elastic.out(1, 0.3)"
+                    });
+                });
+            });
+
+            // Hero Parallax on Mouse Move
+            const heroParallax = document.getElementById('hero-parallax');
+            if(heroParallax && window.innerWidth >= 768) {
+                window.addEventListener('mousemove', (e) => {
+                    const x = (e.clientX / window.innerWidth - 0.5) * 20;
+                    const y = (e.clientY / window.innerHeight - 0.5) * 20;
+                    
+                    gsap.to(heroParallax, {
+                        rotateY: x,
+                        rotateX: -y,
+                        duration: 1.5,
+                        ease: "power2.out"
+                    });
+                });
+            }
+
+            // Marquee Animation
+            const marqueeTracks = document.querySelectorAll('.marquee-track');
+            if (marqueeTracks.length > 0) {
+                gsap.to('.marquee-track', {
+                    xPercent: -100,
+                    repeat: -1,
+                    duration: 30,
+                    ease: "linear"
+                });
+            }
+
+            // Image Gallery Marquee Animation
+            const imageTracks = document.querySelectorAll('.image-marquee-track');
+            if (imageTracks.length > 0) {
+                gsap.to('.image-marquee-track', {
+                    xPercent: -100,
+                    repeat: -1,
+                    duration: 45,
+                    ease: "linear"
+                });
+            }
+
+            // 1. Text Animation (Hero Title)
+            const typeSplit = new SplitType('.hero-title', {
+                types: 'lines, words, chars',
+                tagName: 'span'
+            });
+
+            gsap.fromTo('.hero-title .char', 
+                { y: '115%', opacity: 0, rotateZ: 10, rotateX: -45, transformOrigin: '0% 100%' },
+                { y: '0%', opacity: 1, rotateZ: 0, rotateX: 0, duration: 1.2, ease: 'power4.out', stagger: 0.02, delay: 0.2 }
+            );
+
+            // Flowing Line Animation
+            const flowPaths = document.querySelectorAll('.flowing-line path');
+            flowPaths.forEach((path, index) => {
+                const length = path.getTotalLength();
+                gsap.set(path, { strokeDasharray: length, strokeDashoffset: length });
+                
+                // Draw line
+                gsap.to(path, { 
+                    strokeDashoffset: 0, 
+                    duration: 2.5 + (index * 0.5), 
+                    ease: 'power2.inOut',
+                    delay: 0.5 
+                });
+                
+                // Continuous wave effect
+                gsap.to(path, {
+                    y: index === 0 ? 15 : -15,
+                    duration: 3 + index,
+                    yoyo: true,
+                    repeat: -1,
+                    ease: 'sine.inOut',
+                    delay: 3
+                });
+            });
+
+            // 2. Hero Elements Reveal
+            gsap.fromTo('.gs-reveal', 
+                { y: 30, autoAlpha: 0 },
+                { y: 0, autoAlpha: 1, duration: 0.8, stagger: 0.15, ease: 'power2.out', delay: 0.6 }
+            );
+
+            // 3. Dashboard Mockup Parallax & Entrance
+            gsap.fromTo('.dash-wrapper', 
+                { y: 100, autoAlpha: 0, rotationX: 10 },
+                { y: 0, autoAlpha: 1, rotationX: 0, duration: 1.2, ease: 'power3.out', delay: 0.8 }
+            );
+
+            // Dashboard subtle floating animation
+            gsap.to('.dash-wrapper', {
+                y: -10,
+                duration: 3,
+                yoyo: true,
+                repeat: -1,
+                ease: 'sine.inOut'
+            });
+
+            // Dashboard inner elements entrance animation
+            gsap.fromTo('.dash-menu-item', 
+                { x: -20, autoAlpha: 0 },
+                { x: 0, autoAlpha: 1, duration: 0.5, stagger: 0.1, delay: 1.2, ease: 'power2.out' }
+            );
+            gsap.fromTo('.dash-header', 
+                { y: -10, autoAlpha: 0 },
+                { y: 0, autoAlpha: 1, duration: 0.5, delay: 1.4, ease: 'power2.out' }
+            );
+            gsap.fromTo('.dash-card', 
+                { y: 20, autoAlpha: 0 },
+                { y: 0, autoAlpha: 1, duration: 0.6, stagger: 0.1, delay: 1.5, ease: 'power2.out' }
+            );
+            gsap.fromTo('.dash-list-item', 
+                { x: 20, autoAlpha: 0 },
+                { x: 0, autoAlpha: 1, duration: 0.5, stagger: 0.1, delay: 1.8, ease: 'power2.out' }
+            );
+
+            // 4. Section Headers Scroll Animation
+            gsap.utils.toArray('.section-header').forEach(header => {
+                gsap.from(header, {
+                    scrollTrigger: {
+                        trigger: header,
+                        start: 'top 85%',
+                    },
+                    y: 30,
+                    opacity: 0,
+                    duration: 0.8,
+                    ease: 'power2.out'
+                });
+            });
+
+            // 5. Features Grid Scroll Animation
+            gsap.utils.toArray('.feature-card-anim').forEach((card, i) => {
+                gsap.from(card, {
+                    scrollTrigger: {
+                        trigger: '.perspective-container',
+                        start: 'top 80%',
+                    },
+                    y: 50,
+                    opacity: 0,
+                    duration: 0.6,
+                    delay: i * 0.15,
+                    ease: 'back.out(1.2)'
+                });
+            });
+
+            // 6. CTA Box Parallax
+            gsap.from('.cta-box', {
+                scrollTrigger: {
+                    trigger: '.cta-box',
+                    start: 'top 90%',
+                },
+                y: 50,
+                scale: 0.95,
+                opacity: 0,
+                duration: 1,
+                ease: 'power3.out'
+            });
+
+            // 7. Navbar Blur on Scroll
+            const navbar = document.getElementById('navbar');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    navbar.classList.add('shadow-sm');
+                    navbar.style.background = 'rgba(250, 250, 249, 0.9)';
+                } else {
+                    navbar.classList.remove('shadow-sm');
+                    navbar.style.background = 'rgba(250, 250, 249, 0.85)';
+                }
+            });
+
+            // 8. Reviews Scroll Animation
+            gsap.utils.toArray('.review-card').forEach((card, i) => {
+                gsap.from(card, {
+                    scrollTrigger: {
+                        trigger: card,
+                        start: 'top 85%',
+                    },
+                    y: 40,
+                    opacity: 0,
+                    duration: 0.8,
+                    delay: (i % 3) * 0.15,
+                    ease: 'power3.out'
+                });
+            });
+        });
+
+        // =============================================
+        // PRELOADER
+        // =============================================
+        (function () {
+            const bar = document.getElementById('preloader-bar');
+            const preloader = document.getElementById('preloader');
+            let progress = 0;
+            const tick = setInterval(() => {
+                progress += Math.random() * 18;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(tick);
+                    gsap.to(bar, { width: '100%', duration: 0.3, ease: 'power2.out', onComplete: () => {
+                        gsap.to(preloader, {
+                            yPercent: -100,
+                            duration: 0.85,
+                            ease: 'power3.inOut',
+                            delay: 0.2,
+                            onComplete: () => { preloader.style.display = 'none'; }
+                        });
+                    }});
+                } else {
+                    gsap.to(bar, { width: progress + '%', duration: 0.4, ease: 'power1.out' });
+                }
+            }, 120);
+        })();
+
+        // =============================================
+        // PHYSICS CURSOR
+        // =============================================
+        (function () {
+            const dot  = document.getElementById('cursor-dot');
+            const ring = document.getElementById('cursor-ring');
+            if (!dot || !ring) return;
+
+            // Hide on mobile
+            if (window.matchMedia('(pointer: coarse)').matches) {
+                dot.style.display = 'none';
+                ring.style.display = 'none';
+                document.body.style.cursor = 'auto';
+                return;
+            }
+
+            const setX  = gsap.quickTo(dot,  'x', { duration: 0.12, ease: 'power3' });
+            const setY  = gsap.quickTo(dot,  'y', { duration: 0.12, ease: 'power3' });
+            const setRX = gsap.quickTo(ring, 'x', { duration: 0.45, ease: 'power3' });
+            const setRY = gsap.quickTo(ring, 'y', { duration: 0.45, ease: 'power3' });
+
+            window.addEventListener('mousemove', e => {
+                setX(e.clientX); setY(e.clientY);
+                setRX(e.clientX); setRY(e.clientY);
+            });
+
+            document.querySelectorAll('a, button, [data-cursor-hover], .cursor-pointer').forEach(el => {
+                el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+                el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+            });
+        })();
+
+        // =============================================
+        // MOBILE MENU
+        // =============================================
+        (function () {
+            const hamburger = document.getElementById('hamburger');
+            const menu      = document.getElementById('mobile-menu');
+            const closeBtn  = document.getElementById('mobile-menu-close');
+            const links     = menu ? menu.querySelectorAll('.mobile-menu-link-inner') : [];
+            if (!hamburger || !menu) return;
+
+            let isOpen = false;
+
+            const openMenu = () => {
+                isOpen = true;
+                hamburger.classList.add('open');
+                gsap.set(menu, { visibility: 'visible' });
+                gsap.to(menu, { opacity: 1, duration: 0.4, ease: 'power2.out' });
+                gsap.fromTo(links,
+                    { yPercent: 110 },
+                    { yPercent: 0, duration: 0.65, stagger: 0.08, ease: 'power3.out', delay: 0.1 }
+                );
+                document.body.style.overflow = 'hidden';
+            };
+
+            const closeMenu = () => {
+                isOpen = false;
+                hamburger.classList.remove('open');
+                gsap.to(menu, { opacity: 0, duration: 0.3, ease: 'power2.in', onComplete: () => {
+                    gsap.set(menu, { visibility: 'hidden' });
+                }});
+                document.body.style.overflow = '';
+            };
+
+            hamburger.addEventListener('click', () => isOpen ? closeMenu() : openMenu());
+            if (closeBtn) closeBtn.addEventListener('click', closeMenu);
+            menu.querySelectorAll('.mobile-menu-link').forEach(a => a.addEventListener('click', closeMenu));
+        })();
+
+        // =============================================
+        // FAQ ACCORDION
+        // =============================================
+        (function () {
+            document.querySelectorAll('.faq-trigger').forEach(trigger => {
+                trigger.addEventListener('click', () => {
+                    const item   = trigger.closest('.faq-item');
+                    const answer = item.querySelector('.faq-answer');
+                    const isOpen = item.classList.contains('open');
+
+                    // Close all others
+                    document.querySelectorAll('.faq-item.open').forEach(openItem => {
+                        if (openItem !== item) {
+                            openItem.classList.remove('open');
+                            gsap.to(openItem.querySelector('.faq-answer'), {
+                                height: 0, duration: 0.4, ease: 'power2.inOut'
+                            });
+                        }
+                    });
+
+                    if (isOpen) {
+                        item.classList.remove('open');
+                        gsap.to(answer, { height: 0, duration: 0.4, ease: 'power2.inOut' });
+                    } else {
+                        item.classList.add('open');
+                        // Measure natural height
+                        gsap.set(answer, { height: 'auto' });
+                        const fullH = answer.scrollHeight;
+                        gsap.fromTo(answer,
+                            { height: 0 },
+                            { height: fullH, duration: 0.5, ease: 'power2.out' }
+                        );
+                    }
+                });
+            });
+        })();
+    </script>
+
+    <!-- Pricing Modal Overlay -->
+    <div id="pricing-modal" class="fixed inset-0 z-[100] bg-stone-900/80 backdrop-blur-md hidden items-center justify-center p-4 md:p-6 opacity-0">
+        
+        <!-- Persistent Close Button -->
+        <button class="close-pricing-modal absolute top-6 right-6 md:top-8 md:right-10 w-12 h-12 bg-white/10 hover:bg-white/20 border border-white/20 rounded-full flex items-center justify-center text-white transition-colors z-50">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </button>
+
+        <div id="pricing-modal-content" class="bg-white rounded-[2rem] w-full max-w-6xl max-h-[90vh] overflow-y-auto shadow-2xl relative" data-lenis-prevent>
+            <div class="p-8 md:p-12">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-stone-900 mb-4 tracking-tight">Choose your plan</h2>
+                    <p class="text-stone-500 max-w-xl mx-auto">Whether you're just starting out or managing a growing team, we have a plan designed for you.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    
+                    <!-- Free Plan -->
+                    <div class="border border-stone-200 rounded-3xl p-8 flex flex-col hover:border-brand-300 hover:shadow-xl transition-all bg-stone-50">
+                        <h3 class="text-xl font-bold text-stone-900 mb-2">Free Starter</h3>
+                        <p class="text-stone-500 text-sm mb-6 min-h-[40px]">Perfect for exploring the basics.</p>
+                        <div class="mb-8">
+                            <span class="text-4xl font-bold text-stone-900">$0</span>
+                            <span class="text-stone-500">/mo</span>
+                        </div>
+                        <ul class="space-y-4 text-sm text-stone-700 mb-8 flex-1">
+                            <li class="flex items-start gap-3"><i data-lucide="check" class="w-5 h-5 text-brand-500 shrink-0"></i> 1 User only</li>
+                            <li class="flex items-start gap-3"><i data-lucide="check" class="w-5 h-5 text-brand-500 shrink-0"></i> Up to 5 invoices/mo</li>
+                            <li class="flex items-start gap-3"><i data-lucide="check" class="w-5 h-5 text-brand-500 shrink-0"></i> Basic income & expense tracking</li>
+                            <li class="flex items-start gap-3 text-stone-400"><i data-lucide="x" class="w-5 h-5 shrink-0"></i> No bank connections</li>
+                        </ul>
+                        <button class="w-full py-3 rounded-full border-2 border-stone-200 text-stone-700 font-semibold hover:bg-stone-200 transition-colors">Current Plan</button>
+                    </div>
+
+                    <!-- Simple Start -->
+                    <div class="border border-stone-200 rounded-3xl p-8 flex flex-col hover:border-brand-300 hover:shadow-xl transition-all">
+                        <h3 class="text-xl font-bold text-stone-900 mb-2">Simple Start</h3>
+                        <p class="text-stone-500 text-sm mb-6 min-h-[40px]">For solo entrepreneurs.</p>
+                        <div class="mb-8">
+                            <span class="text-4xl font-bold text-stone-900">$15</span>
+                            <span class="text-stone-500">/mo</span>
+                        </div>
+                        <ul class="space-y-4 text-sm text-stone-700 mb-8 flex-1">
+                            <li class="flex items-start gap-3"><i data-lucide="check" class="w-5 h-5 text-brand-500 shrink-0"></i> 1 User + your accountant</li>
+                            <li class="flex items-start gap-3"><i data-lucide="check" class="w-5 h-5 text-brand-500 shrink-0"></i> Unlimited invoices</li>
+                            <li class="flex items-start gap-3"><i data-lucide="check" class="w-5 h-5 text-brand-500 shrink-0"></i> Connect 1 bank account</li>
+                            <li class="flex items-start gap-3"><i data-lucide="check" class="w-5 h-5 text-brand-500 shrink-0"></i> Maximize tax deductions</li>
+                        </ul>
+                        <button class="w-full py-3 rounded-full bg-stone-900 text-white font-semibold hover:bg-stone-800 transition-colors">Select Plan</button>
+                    </div>
+
+                    <!-- Essentials -->
+                    <div class="border-2 border-brand-500 rounded-3xl p-8 flex flex-col hover:shadow-xl transition-all relative transform md:-translate-y-4 shadow-lg bg-white">
+                        <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-brand-500 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Most Popular</div>
+                        <h3 class="text-xl font-bold text-stone-900 mb-2">Essentials</h3>
+                        <p class="text-stone-500 text-sm mb-6 min-h-[40px]">For growing businesses.</p>
+                        <div class="mb-8">
+                            <span class="text-4xl font-bold text-stone-900">$30</span>
+                            <span class="text-stone-500">/mo</span>
+                        </div>
+                        <ul class="space-y-4 text-sm text-stone-700 mb-8 flex-1">
+                            <li class="flex items-start gap-3"><i data-lucide="check" class="w-5 h-5 text-brand-500 shrink-0"></i> Up to 3 users</li>
+                            <li class="flex items-start gap-3"><i data-lucide="check" class="w-5 h-5 text-brand-500 shrink-0"></i> Unlimited bank connections</li>
+                            <li class="flex items-start gap-3"><i data-lucide="check" class="w-5 h-5 text-brand-500 shrink-0"></i> Manage and pay bills</li>
+                            <li class="flex items-start gap-3"><i data-lucide="check" class="w-5 h-5 text-brand-500 shrink-0"></i> Time tracking</li>
+                        </ul>
+                        <button class="w-full py-3 rounded-full bg-brand-600 text-white font-semibold hover:bg-brand-700 transition-colors shadow-md shadow-brand-600/20">Select Plan</button>
+                    </div>
+
+                    <!-- Plus -->
+                    <div class="border border-stone-200 rounded-3xl p-8 flex flex-col hover:border-brand-300 hover:shadow-xl transition-all">
+                        <h3 class="text-xl font-bold text-stone-900 mb-2">Plus</h3>
+                        <p class="text-stone-500 text-sm mb-6 min-h-[40px]">For established businesses.</p>
+                        <div class="mb-8">
+                            <span class="text-4xl font-bold text-stone-900">$45</span>
+                            <span class="text-stone-500">/mo</span>
+                        </div>
+                        <ul class="space-y-4 text-sm text-stone-700 mb-8 flex-1">
+                            <li class="flex items-start gap-3"><i data-lucide="check" class="w-5 h-5 text-brand-500 shrink-0"></i> Up to 5 users</li>
+                            <li class="flex items-start gap-3"><i data-lucide="check" class="w-5 h-5 text-brand-500 shrink-0"></i> Track inventory</li>
+                            <li class="flex items-start gap-3"><i data-lucide="check" class="w-5 h-5 text-brand-500 shrink-0"></i> Track project profitability</li>
+                            <li class="flex items-start gap-3"><i data-lucide="check" class="w-5 h-5 text-brand-500 shrink-0"></i> Advanced reporting</li>
+                        </ul>
+                        <button class="w-full py-3 rounded-full bg-stone-900 text-white font-semibold hover:bg-stone-800 transition-colors">Select Plan</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Pricing Modal Logic
+            const modal = document.getElementById('pricing-modal');
+            const modalContent = document.getElementById('pricing-modal-content');
+            const openBtns = document.querySelectorAll('.open-pricing-modal');
+            const closeBtns = document.querySelectorAll('.close-pricing-modal');
+
+            let modalTl = gsap.timeline({ paused: true });
+            
+            modalTl.to(modal, {
+                display: 'flex',
+                opacity: 1,
+                duration: 0.3,
+                ease: 'power2.out'
+            }).fromTo(modalContent, {
+                y: 50,
+                scale: 0.95,
+                opacity: 0
+            }, {
+                y: 0,
+                scale: 1,
+                opacity: 1,
+                duration: 0.4,
+                ease: 'back.out(1.2)'
+            }, "-=0.1");
+
+            openBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    modalTl.play();
+                    document.body.style.overflow = 'hidden';
+                });
+            });
+
+            closeBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    modalTl.reverse();
+                    document.body.style.overflow = '';
+                });
+            });
+
+            // Close on click outside
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modalTl.reverse();
+                    document.body.style.overflow = '';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
