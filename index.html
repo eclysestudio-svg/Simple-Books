@@ -1060,6 +1060,15 @@
             }
             requestAnimationFrame(raf);
 
+            // Logo Click to Top
+            const logo = document.getElementById('nav-logo');
+            if (logo) {
+                logo.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    lenis.scrollTo(0);
+                });
+            }
+
 
             // Magnetic Buttons
             const magneticBtns = document.querySelectorAll('.magnetic-btn');
