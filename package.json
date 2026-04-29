@@ -4,10 +4,8 @@
   "description": "Simple Books Landing Page",
   "main": "index.html",
   "scripts": {
-    "start": "live-server",
-    "build": "echo \"Build step complete\""
+    "start": "live-server ."
   },
-  "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
